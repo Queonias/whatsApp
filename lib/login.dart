@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/cadastro.dart';
+import 'package:whatsapp/home.dart';
+import 'package:whatsapp/model/usuario.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -9,6 +12,61 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final TextEditingController _controllerEmail = TextEditingController();
+  final TextEditingController _controllerSenha = TextEditingController();
+
+  void _validarCampos() {
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+    if (email.isNotEmpty && email.contains("@")) {
+      if (senha.isNotEmpty) {
+        Usuario usuario = Usuario();
+        usuario.email = email;
+        usuario.senha = senha;
+        _logarUsuario(usuario);
+      } else {
+        setState(() {
+          const snackBar = SnackBar(
+            content: Text("Preencha a senha!"),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
+      }
+    } else {
+      setState(() {
+        const snackBar = SnackBar(
+          content: Text("Preencha o e-mail utilizando @"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
+    }
+  }
+
+  _logarUsuario(Usuario usuario) {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth
+        .signInWithEmailAndPassword(
+            email: usuario.email, password: usuario.senha)
+        .then((firebaseUser) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const Home()));
+    }).catchError((error) {
+      setState(() {
+        const snackBar = SnackBar(
+          content:
+              Text("Erro ao autenticar usuário, verifique e-mail e senha!"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +86,7 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    controller: _controllerEmail,
                     autofocus: true,
                     keyboardType: TextInputType.emailAddress,
                     style: const TextStyle(fontSize: 20),
@@ -42,6 +101,8 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 TextField(
+                  controller: _controllerSenha,
+                  obscureText: true,
                   autofocus: false,
                   keyboardType: TextInputType.text,
                   style: const TextStyle(fontSize: 20),
@@ -58,7 +119,7 @@ class _LoginState extends State<Login> {
                   padding: const EdgeInsets.only(top: 16, bottom: 10),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, "/home");
+                      _validarCampos();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff25d366),
