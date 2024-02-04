@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/home.dart';
+import 'package:whatsapp/model/usuario.dart';
 
 class Cadastro extends StatefulWidget {
   const Cadastro({super.key});
@@ -8,13 +11,86 @@ class Cadastro extends StatefulWidget {
 }
 
 class _CadastroState extends State<Cadastro> {
+  final TextEditingController _controllerNome = TextEditingController();
+  final TextEditingController _controllerEmail = TextEditingController();
+  final TextEditingController _controllerSenha = TextEditingController();
+
+  void _validarCampos() {
+    String nome = _controllerNome.text;
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+
+    if (nome.isNotEmpty && nome.length >= 3) {
+      if (email.isNotEmpty && email.contains("@")) {
+        if (senha.isNotEmpty && senha.length > 6) {
+          Usuario usuario = Usuario();
+          usuario.nome = nome;
+          usuario.email = email;
+          usuario.senha = senha;
+          _cadastrarUsuario(usuario);
+        } else {
+          setState(() {
+            const snackBar = SnackBar(
+              content: Text("Preencha a senha!"),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          });
+        }
+      } else {
+        setState(() {
+          const snackBar = SnackBar(
+            content: Text("Preencha o e-mail utilizando @"),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
+      }
+    } else {
+      setState(() {
+        const snackBar = SnackBar(
+          content: Text("Nome precisa ter mais que 2 caracteres!",
+              style: TextStyle(color: Colors.red)),
+          // backgroundColor: Colors.red,
+
+          duration: Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
+    }
+  }
+
+  _cadastrarUsuario(Usuario usuario) {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth
+        .createUserWithEmailAndPassword(
+            email: usuario.email, password: usuario.senha)
+        .then((firebaseUser) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const Home()));
+    }).catchError((error) {
+      setState(() {
+        const snackBar = SnackBar(
+          content: Text(
+              "Erro ao cadastrar usuário, verifique os campos e tente novamente!"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xff075e54),
-          title: const Text('Cadastro'),
-        ),
+            backgroundColor: const Color(0xff075e54),
+            title:
+                const Text('Cadastro', style: TextStyle(color: Colors.white)),
+            iconTheme: const IconThemeData(color: Colors.white)),
         body: Container(
           decoration: const BoxDecoration(color: Color(0xff075e54)),
           child: Padding(
@@ -31,6 +107,7 @@ class _CadastroState extends State<Cadastro> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: TextField(
+                        controller: _controllerNome,
                         autofocus: true,
                         keyboardType: TextInputType.text,
                         style: const TextStyle(fontSize: 20),
@@ -48,6 +125,7 @@ class _CadastroState extends State<Cadastro> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: TextField(
+                        controller: _controllerEmail,
                         autofocus: false,
                         keyboardType: TextInputType.emailAddress,
                         style: const TextStyle(fontSize: 20),
@@ -63,6 +141,7 @@ class _CadastroState extends State<Cadastro> {
                       ),
                     ),
                     TextField(
+                      controller: _controllerSenha,
                       autofocus: false,
                       keyboardType: TextInputType.text,
                       style: const TextStyle(fontSize: 20),
@@ -75,12 +154,13 @@ class _CadastroState extends State<Cadastro> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(32)),
                       ),
+                      obscureText: true,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 16, bottom: 10),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushReplacementNamed(context, "/home");
+                          _validarCampos();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff25d366),
@@ -90,7 +170,7 @@ class _CadastroState extends State<Cadastro> {
                           ),
                         ),
                         child: const Text(
-                          "Entrar",
+                          "Cadastrar",
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
