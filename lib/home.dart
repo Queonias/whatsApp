@@ -14,6 +14,7 @@ class _HomeState extends State<Home> {
 
   Future _verificarUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
+    // auth.signOut();
     User? usuarioLogado = auth.currentUser;
     if (usuarioLogado != null) {
       final User? usuarioLogado = auth.currentUser;
@@ -39,9 +40,23 @@ class _HomeState extends State<Home> {
         backgroundColor: const Color(0xff075e54),
         title: const Text('WhatsApp', style: TextStyle(color: Colors.white)),
       ),
-      body: Center(
-        child: Text(
-          _emailUsuario,
+      body: Container(
+        child: Column(
+          children: [
+            Text(
+              _emailUsuario,
+            ),
+            TextButton(
+              onPressed: () {
+                FirebaseAuth auth = FirebaseAuth.instance;
+                auth.signOut().then((_) {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => const Login()));
+                });
+              },
+              child: const Text("Deslogar"),
+            ),
+          ],
         ),
       ),
     );
