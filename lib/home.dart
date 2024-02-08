@@ -12,18 +12,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  String _emailUsuario = "";
   late TabController _tabController;
 
   Future _verificarUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    // auth.signOut();
     User? usuarioLogado = auth.currentUser;
     if (usuarioLogado != null) {
-      final User? usuarioLogado = auth.currentUser;
-      setState(() {
-        _emailUsuario = usuarioLogado!.email!;
-      });
+      setState(() {});
     } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const Login()));
