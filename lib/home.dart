@@ -13,7 +13,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
+  List<String> itensMenu = ['Configuracoes', 'Deslogar'];
   Future _verificarUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     User? usuarioLogado = auth.currentUser;
@@ -34,6 +34,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       vsync: this,
     );
     _verificarUsuarioLogado();
+  }
+
+  _escolhaMenuItem(String escolha) {
+    switch (escolha) {
+      case 'Configuracoes':
+        print('Configuracoes');
+        break;
+      case 'Deslogar':
+        _deslogarUsuario();
+        // FirebaseAuth auth = FirebaseAuth.instance;
+        // auth.signOut();
+        // Navigator.pushReplacement(
+        //     context, MaterialPageRoute(builder: (context) => const Login()));
+        break;
+    }
+  }
+
+  _deslogarUsuario() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    await auth.signOut();
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const Login()));
   }
 
   @override
@@ -57,6 +79,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               Tab(text: "Conversas"),
               Tab(text: "Contatos"),
             ]),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String escolha) {
+              if (escolha == 'Configuracoes') {
+                print('Configuracoes');
+              } else if (escolha == 'Deslogar') {
+                FirebaseAuth auth = FirebaseAuth.instance;
+                auth.signOut();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const Login()));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return itensMenu.map((String escolha) {
+                return PopupMenuItem<String>(
+                  value: escolha,
+                  child: Text(escolha),
+                );
+              }).toList();
+            },
+          )
+        ],
       ),
       body: TabBarView(
         controller: _tabController,

@@ -11,13 +11,13 @@ class AbaConversas extends StatefulWidget {
 class _AbaConversasState extends State<AbaConversas> {
   List<Conversa> listaConversas = [
     Conversa("Ana Clara", "Olá, tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/peaceful-garden-352712.appspot.com/o/perfil%2Fperfil1.jpg?alt=media&token=949409ba-2503-4843-803d-31e8d2124e51"),
+        "https://firebasestorage.googleapis.com/v0/b/whatsapp-b70ec.appspot.com/o/perfil%2Fperfil1.jpg?alt=media&token=d10201d8-bcdb-4344-88ce-d09dda5f4616"),
     Conversa("Maria", "Oi, tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/peaceful-garden-352712.appspot.com/o/perfil%2Fperfil3.jpg?alt=media&token=c12c89ef-bbf7-4530-bad1-66702d828c56"),
+        "https://firebasestorage.googleapis.com/v0/b/whatsapp-b70ec.appspot.com/o/perfil%2Fperfil3.jpg?alt=media&token=7de4ddb3-d73a-4415-b55c-8d87f1e9ec99"),
     Conversa("Pedro", "Olá, tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/peaceful-garden-352712.appspot.com/o/perfil%2Fperfil2.jpg?alt=media&token=92906c7d-e278-4c70-bf6c-11ddf66080b1"),
+        "https://firebasestorage.googleapis.com/v0/b/whatsapp-b70ec.appspot.com/o/perfil%2Fperfil2.jpg?alt=media&token=d3096179-a541-47dd-b380-5f6c41d6b265"),
     Conversa("João", "Oi, tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/peaceful-garden-352712.appspot.com/o/perfil%2Fperfil4.jpg?alt=media&token=4cd2d8f4-4aaa-4223-9276-bd487a0b74fb"),
+        "https://firebasestorage.googleapis.com/v0/b/whatsapp-b70ec.appspot.com/o/perfil%2Fperfil4.jpg?alt=media&token=151320be-c564-4984-bd83-25137b0a6777"),
   ];
 
   @override
