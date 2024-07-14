@@ -1,32 +1,34 @@
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter/material.dart';
+import 'package:whatsapp/cadastro.dart';
 import 'package:whatsapp/home.dart';
 import 'package:whatsapp/login.dart';
 
-List<Route<dynamic>> onGenerateInitialRoutes(String initialRouteName) {
-  bool isLoggedIn = checkUserLoggedIn();
+class RouteGenerator {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    final args = settings.arguments;
 
-  if (isLoggedIn) {
-    return [
-      MaterialPageRoute(
-        builder: (context) => const Home(),
-        settings: const RouteSettings(name: '/home'),
-      ),
-    ];
-  } else {
-    return [
-      MaterialPageRoute(
-        builder: (context) => const Login(),
-        settings: const RouteSettings(name: '/login'),
-      ),
-    ];
+    switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(builder: (_) => const Login());
+      case '/home':
+        return MaterialPageRoute(builder: (_) => const Home());
+      case '/cadastro':
+        return MaterialPageRoute(builder: (_) => const Cadastro());
+      default:
+        return _errorRoute();
+    }
   }
-}
 
-bool checkUserLoggedIn() {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final User? usuarioLogado = auth.currentUser;
-  if (usuarioLogado != null) return true;
-  return false;
+  static Route<dynamic> _errorRoute() {
+    return MaterialPageRoute(builder: (_) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Tela não encontrada'),
+        ),
+        body: const Center(
+          child: Text('Tela não encontrada'),
+        ),
+      );
+    });
+  }
 }

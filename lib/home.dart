@@ -20,8 +20,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     if (usuarioLogado != null) {
       setState(() {});
     } else {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const Login()));
+      Navigator.pushNamed(context, '/login');
     }
   }
 
@@ -36,26 +35,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     _verificarUsuarioLogado();
   }
 
-  _escolhaMenuItem(String escolha) {
+  _escolhaMenuItem(String escolha, context) {
     switch (escolha) {
       case 'Configuracoes':
         print('Configuracoes');
         break;
       case 'Deslogar':
-        _deslogarUsuario();
-        // FirebaseAuth auth = FirebaseAuth.instance;
-        // auth.signOut();
-        // Navigator.pushReplacement(
-        //     context, MaterialPageRoute(builder: (context) => const Login()));
+        _deslogarUsuario(context);
         break;
     }
   }
 
-  _deslogarUsuario() async {
+  _deslogarUsuario(context) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     await auth.signOut();
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const Login()));
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/', (Route<dynamic> route) => false);
   }
 
   @override
@@ -82,14 +77,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         actions: [
           PopupMenuButton<String>(
             onSelected: (String escolha) {
-              if (escolha == 'Configuracoes') {
-                print('Configuracoes');
-              } else if (escolha == 'Deslogar') {
-                FirebaseAuth auth = FirebaseAuth.instance;
-                auth.signOut();
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => const Login()));
-              }
+              _escolhaMenuItem(escolha, context);
             },
             itemBuilder: (BuildContext context) {
               return itensMenu.map((String escolha) {

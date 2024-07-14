@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:whatsapp/login.dart';
-import 'package:whatsapp/home.dart'; // Importe a tela Home
 import 'package:whatsapp/navigation/route_generator.dart';
+import 'package:whatsapp/navigation/on_generate_initial_routes.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -24,11 +23,7 @@ void main() async {
       ),
       useMaterial3: true,
     ),
-    initialRoute: '/',
     onGenerateInitialRoutes: onGenerateInitialRoutes,
-    routes: {
-      '/home': (context) => const Home(),
-      '/login': (context) => const Login(),
-    },
+    onGenerateRoute: RouteGenerator.generateRoute,
   ));
 }

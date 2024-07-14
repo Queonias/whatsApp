@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/cadastro.dart';
-import 'package:whatsapp/home.dart';
 import 'package:whatsapp/model/usuario.dart';
 
 class Login extends StatefulWidget {
@@ -52,8 +51,7 @@ class _LoginState extends State<Login> {
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const Home()));
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     }).catchError((error) {
       setState(() {
         const snackBar = SnackBar(

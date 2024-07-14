@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp/home.dart';
 import 'package:whatsapp/model/usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -77,9 +76,9 @@ class _CadastroState extends State<Cadastro> {
           .collection("usuarios")
           .doc(firebaseUser.user!.uid)
           .set(usuario.toMap());
-      Navigator.pushAndRemoveUntil(
+      Navigator.pushNamedAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const Home()),
+        '/home',
         (route) => false, // Remove todas as rotas na pilha
       );
     }).catchError((error) {
