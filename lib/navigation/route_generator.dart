@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:whatsapp/cadastro.dart';
 import 'package:whatsapp/home.dart';
 import 'package:whatsapp/login.dart';
+import 'package:whatsapp/telas/configuracoes.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    final args = settings.arguments;
-
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) => const Login());
@@ -14,6 +13,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const Home());
       case '/cadastro':
         return MaterialPageRoute(builder: (_) => const Cadastro());
+      case '/configuracoes':
+        return MaterialPageRoute(builder: (_) => const Configuracoes());
       default:
         return _errorRoute();
     }

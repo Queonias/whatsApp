@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp/login.dart';
 import 'package:whatsapp/telas/abas_contatos.dart';
 import 'package:whatsapp/telas/abas_conversas.dart';
 
@@ -38,7 +37,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   _escolhaMenuItem(String escolha, context) {
     switch (escolha) {
       case 'Configuracoes':
-        print('Configuracoes');
+        Navigator.pushNamed(context, '/configuracoes');
         break;
       case 'Deslogar':
         _deslogarUsuario(context);
@@ -79,6 +78,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             onSelected: (String escolha) {
               _escolhaMenuItem(escolha, context);
             },
+            color: Colors.grey[200],
             itemBuilder: (BuildContext context) {
               return itensMenu.map((String escolha) {
                 return PopupMenuItem<String>(
