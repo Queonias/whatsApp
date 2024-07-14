@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -11,7 +13,10 @@ class Configuracoes extends StatefulWidget {
 
 class _ConfiguracoesState extends State<Configuracoes> {
   final TextEditingController _controllerNome = TextEditingController();
-  XFile? _imagem;
+  late String _idUsuarioLogado;
+  File? _imagem;
+  bool _subindoImagem = false;
+  String? urlImagemRecuperada;
 
   Future _recuperarImagem(String origemImagem) async {
     ImagePicker imagePicker = ImagePicker();
@@ -27,14 +32,63 @@ class _ConfiguracoesState extends State<Configuracoes> {
         break;
     }
 
-    setState(() {
-      _imagem = imagemSelecionada;
+    if (imagemSelecionada != null) {
+      File file = File(imagemSelecionada.path);
+      setState(() {
+        _imagem = file;
+      });
+    }
+
+    if (_imagem != null) {
+      setState(() {
+        _subindoImagem = true;
+      });
+      _uploadImagem(_imagem);
+    }
+  }
+
+  Future _uploadImagem(imagem) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference pastaRaiz = storage.ref();
+    Reference arquivo =
+        pastaRaiz.child("perfil").child("$_idUsuarioLogado.jpg");
+
+    UploadTask task = arquivo.putFile(imagem);
+    task.snapshotEvents.listen((TaskSnapshot snapshot) {
+      if (snapshot.state == TaskState.running) {
+        setState(() {
+          _subindoImagem = true;
+        });
+      } else if (snapshot.state == TaskState.success) {
+        setState(() {
+          _subindoImagem = false;
+        });
+      }
     });
-    // if (imagemSelecionada != null) {
-    //   setState(() {
-    //     _imagem = File(imagemSelecionada.path);
-    //   });
-    // }
+
+    try {
+      await task;
+      String url = await arquivo.getDownloadURL();
+      setState(() {
+        urlImagemRecuperada = url;
+      });
+      // Agora você pode usar a URL da imagem, por exemplo, armazená-la no Firestore ou exibi-la no app.
+    } catch (e) {
+      print('Erro ao obter a URL da imagem: $e');
+    }
+  }
+
+  _recuperarDadosUsuario() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? usuarioLogado = auth.currentUser;
+    _idUsuarioLogado = usuarioLogado!.uid;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _recuperarDadosUsuario();
   }
 
   @override
@@ -48,12 +102,13 @@ class _ConfiguracoesState extends State<Configuracoes> {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              const CircleAvatar(
-                radius: 100,
-                backgroundColor: Colors.grey,
-                backgroundImage: NetworkImage(
-                    "https://firebasestorage.googleapis.com/v0/b/whatsapp-b70ec.appspot.com/o/perfil%2Fperfil3.jpg?alt=media&token=7de4ddb3-d73a-4415-b55c-8d87f1e9ec99"),
-              ),
+              _subindoImagem ? const CircularProgressIndicator() : Container(),
+              CircleAvatar(
+                  radius: 100,
+                  backgroundColor: Colors.grey,
+                  backgroundImage: urlImagemRecuperada == null
+                      ? null
+                      : NetworkImage(urlImagemRecuperada!)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
