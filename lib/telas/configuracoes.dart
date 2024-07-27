@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -36,14 +37,36 @@ class _ConfiguracoesState extends State<Configuracoes> {
       File file = File(imagemSelecionada.path);
       setState(() {
         _imagem = file;
-      });
-    }
-
-    if (_imagem != null) {
-      setState(() {
         _subindoImagem = true;
       });
-      _uploadImagem(_imagem);
+    }
+    _uploadImagem(_imagem);
+  }
+
+  _atualizarNomeFirestore() async {
+    String nome = _controllerNome.text;
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    Map<String, dynamic> dadosAtualizar = {"nome": nome};
+    try {
+      await db
+          .collection("usuarios")
+          .doc(_idUsuarioLogado)
+          .update(dadosAtualizar);
+    } catch (e) {
+      print('Erro ao atualizar a URL da imagem: $e');
+    }
+  }
+
+  _atualizarUrlImagem(String url) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    Map<String, dynamic> dadosAtualizar = {"urlImagem": url};
+    try {
+      await db
+          .collection("usuarios")
+          .doc(_idUsuarioLogado)
+          .update(dadosAtualizar);
+    } catch (e) {
+      print('Erro ao atualizar a URL da imagem: $e');
     }
   }
 
@@ -69,10 +92,10 @@ class _ConfiguracoesState extends State<Configuracoes> {
     try {
       await task;
       String url = await arquivo.getDownloadURL();
+      _atualizarUrlImagem(url);
       setState(() {
         urlImagemRecuperada = url;
       });
-      // Agora você pode usar a URL da imagem, por exemplo, armazená-la no Firestore ou exibi-la no app.
     } catch (e) {
       print('Erro ao obter a URL da imagem: $e');
     }
@@ -80,13 +103,25 @@ class _ConfiguracoesState extends State<Configuracoes> {
 
   _recuperarDadosUsuario() async {
     FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseFirestore db = FirebaseFirestore.instance;
+
     User? usuarioLogado = auth.currentUser;
     _idUsuarioLogado = usuarioLogado!.uid;
+
+    DocumentSnapshot snapshot =
+        await db.collection("usuarios").doc(_idUsuarioLogado).get();
+
+    Map<String, dynamic> dados = snapshot.data() as Map<String, dynamic>;
+    _controllerNome.text = dados["nome"];
+    if (dados["urlImagem"] != null) {
+      setState(() {
+        urlImagemRecuperada = dados["urlImagem"];
+      });
+    }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperarDadosUsuario();
   }
@@ -102,7 +137,12 @@ class _ConfiguracoesState extends State<Configuracoes> {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              _subindoImagem ? const CircularProgressIndicator() : Container(),
+              const Padding(padding: EdgeInsets.all(16)),
+              Container(
+                child: _subindoImagem
+                    ? const CircularProgressIndicator()
+                    : Container(),
+              ),
               CircleAvatar(
                   radius: 100,
                   backgroundColor: Colors.grey,
@@ -131,6 +171,9 @@ class _ConfiguracoesState extends State<Configuracoes> {
                   autofocus: true,
                   keyboardType: TextInputType.text,
                   style: const TextStyle(fontSize: 20),
+                  // onChanged: (text) {
+                  //   _atualizarNomeFirestore();
+                  // },
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
                     hintText: "Nome",
@@ -145,7 +188,7 @@ class _ConfiguracoesState extends State<Configuracoes> {
                 padding: const EdgeInsets.only(top: 16, bottom: 10),
                 child: ElevatedButton(
                   onPressed: () {
-                    // _validarCampos();
+                    _atualizarNomeFirestore();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff25d366),
